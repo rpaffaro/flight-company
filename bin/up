@@ -1,0 +1,13 @@
+if ARGV[0].eql?('rubocop')
+  require "bundler/inline"
+
+  gemfile do
+    source "https://rubygems.org"
+
+    gem 'rubocop', require: false
+  end
+
+  system('rubocop')
+else
+  require './flight_company.rb'
+end
