@@ -8,8 +8,11 @@ RUN apt-get update
 
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
+COPY . .
 
+RUN chmod +x ./bin/docker-entrypoint
 ENTRYPOINT ["./bin/docker-entrypoint"]
 
-EXPOSE 3000
-CMD ["./bin/rails", "server"]
+ENV RAILS_ENV production
+EXPOSE 80
+CMD ["./bin/rails", "server", "-b", "0.0.0.0", "-p", "80"]

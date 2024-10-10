@@ -1,0 +1,27 @@
+ARG RUBY_VERSION=3.3.4
+FROM registry.docker.com/library/ruby:$RUBY_VERSION
+
+WORKDIR /app
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release \
+    && curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add - \
+    && echo "deb [arch=$(dpkg --print-architecture)] https://download.docker.com/linux/debian $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
+    && apt-get update \
+    && apt-get install -y docker-ce docker-ce-cli containerd.io \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV APP_USER docker_user
+RUN adduser -u 1000 --system --group $APP_USER
+RUN usermod -aG docker $APP_USER
+
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+ENTRYPOINT ["./bin/docker-entrypoint"]
+
+EXPOSE 3000
+CMD ["./bin/rails", "server"]
